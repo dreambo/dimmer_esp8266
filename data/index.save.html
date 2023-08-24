@@ -20,25 +20,18 @@
     <button class="btn-close btn btn-sm">×</button>
     <div class="container">
       <div class="hero">
-
         <h1 class="title">ESP32 LittleFS Webserver for RobotDyn AC Dimmer</h1>
         <div class="toggle-div">
+            <p class="label">Toggle Switch</p>
+            <input type="checkbox" id="switch" onclick="buttonSwitch(this.checked)"/><label for="switch">Toggle</label>
+        </div>
 
-          <p class="label">ON</p>
-          <input type="checkbox" id="switch_on" onclick="switchOn(this.checked)"/><label for="switch_on">Toggle</label>
-          &nbsp;
-          <div class="slider-content">
-            &nbsp;
-            <div id="container" class="center">
+        <div class="slider-content">
+          <div id="container" class="center">
               <div id="sliderLabel">0</div>
-                  <input type="range" min="0" max="100" id="sliderId" step="2" value="0" onchange="updateSlider(this.value)">
-              </div>
-            </div>
-            &nbsp;
-            <input type="checkbox" id="switch_off" onclick="switchOff(this.checked)"/><label for="switch_off">Toggle</label>
-            <p class="label">&nbsp;OFF</p>
-
+              <input type="range" min="0" max="100" id="sliderId" step="2" value="0" onchange="updateSlider(this.value)">
           </div>
+        </div>
 
       </div>
     </div>

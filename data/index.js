@@ -1,6 +1,15 @@
-function toggleButtonSwitch(value) {
-  value = (value ? 11 : 0);
-  updateSlider(value)
+function switchOn(value) {
+  if (value) {
+    updateSlider(100);
+    document.getElementById("switch_off").checked = false;
+  }
+}
+
+function switchOff(value) {
+  if (value) {
+    updateSlider(0);
+    document.getElementById("switch_on").checked = false;
+  }
 }
 
 function updateSlider(value) {
@@ -11,5 +20,5 @@ function updateSlider(value) {
 
 function send(value) {
   console.log('dimmer value:', value);
-  fetch(`/toggle?status=${value}`).then(res => console.log(res));
+  fetch(`/dimmer?power=${value}`).then(res => console.log(res));
 }
