@@ -4,17 +4,22 @@
 #include "mqtt.h"
 #include "dimmer.h"
 #include <AsyncElegantOTA.h>
+#include <WebSerial.h>
 
 const String WIFI_SSID = "freeboxhd";
 const String WIFI_PASSWORD = "01002003004005F";
 Ticker serverTimer;
 AsyncWebServer* server = NULL;
 
+void setup2() {
+  Serial.begin(921600);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, 1);
+}
+
 void setup() {
 
   Serial.begin(921600);
-
-    Serial.println("------------>" + String(ESP.getSdkVersion()));
 
   // Webserver
   server = initServer();
@@ -29,6 +34,9 @@ void setup() {
     // dimmer
     setup_dimmer();
 
+    // WebSerial
+    WebSerial.begin(server);
+
     // ElegantOTA (accessible via /update)
     AsyncElegantOTA.begin(server);
 
@@ -36,6 +44,7 @@ void setup() {
       Serial.println("------------->- Restaring server..." + String(ESP.getFreeHeap()));
       delete server;
       server = initServer();
+      WebSerial.begin(server);
       AsyncElegantOTA.begin(server);
       server->begin();
     });

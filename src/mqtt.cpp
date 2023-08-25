@@ -34,11 +34,11 @@ void connectToMqtt() {
 }
 
 void mqttSubscribe() {
-  mqttClient.subscribe(MQTT_SUB_BATTERY_POWER, 1); // power of battery (negatif if discharging)
-  mqttClient.subscribe(MQTT_SUB_BATTERY_STATE, 1); // percent of battery charge 
-  mqttClient.subscribe(MQTT_SUB_HOME_POWER, 1);    // inverter output active power 
+  // mqttClient.subscribe(MQTT_SUB_BATTERY_POWER, 1); // power of battery (negatif if discharging)
+  // mqttClient.subscribe(MQTT_SUB_BATTERY_STATE, 1); // percent of battery charge 
+  // mqttClient.subscribe(MQTT_SUB_HOME_POWER, 1);    // inverter output active power 
   mqttClient.subscribe(MQTT_SUB_DIM, 1);           // manual set of percent of dimmer power
-  mqttClient.subscribe(MQTT_SUB_MAINS, 1);         // mains power
+  // mqttClient.subscribe(MQTT_SUB_MAINS, 1);         // mains power
 }
 
 void setDimmerValue() {
@@ -163,7 +163,7 @@ void setup_mqtt() {
 
   while (!WiFi.isConnected()) {
     Serial.print("-");
-    delay(1000);
+    delay(500);
   }
   connectToMqtt();
 }
