@@ -17,6 +17,14 @@ void setup2() {
   digitalWrite(LED_BUILTIN, 1);
 }
 
+void reloadWebServer() {
+  delete server;
+  server = initServer();
+  WebSerial.begin(server);
+  AsyncElegantOTA.begin(server);
+  server->begin();
+}
+
 void setup() {
 
   Serial.begin(921600);
@@ -40,13 +48,9 @@ void setup() {
     // ElegantOTA (accessible via /update)
     AsyncElegantOTA.begin(server);
 
-    serverTimer.attach(600, []() {
+    serverTimer.attach(60, []() {
       Serial.println("------------->- Restaring server..." + String(ESP.getFreeHeap()));
-      delete server;
-      server = initServer();
-      WebSerial.begin(server);
-      AsyncElegantOTA.begin(server);
-      server->begin();
+      // reloadWebServer();
     });
 
     // start the server

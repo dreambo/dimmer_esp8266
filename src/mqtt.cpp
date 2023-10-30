@@ -3,7 +3,7 @@
 #include "wifi.h"
 #include "dimmer.h"
 
-#define MQTT_HOST IPAddress(34, 155, 150, 240)
+#define MQTT_HOST IPAddress(192,168,0,6)
 #define MQTT_PORT 1883
 
 // MQTT Topics
@@ -130,8 +130,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   Serial.print("  total: ");
   Serial.println(total);
   */
-  // Serial.print(topic);
-  // Serial.println(" --> " + toString(payload, len));
+  Serial.print(topic);
+  Serial.println(" --> " + toString(payload, len));
 
   if (strcmp(topic, MQTT_SUB_BATTERY_POWER) == 0) {
     batteryPower = toString(payload, len).toInt();
