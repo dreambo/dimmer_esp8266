@@ -46,6 +46,11 @@ AsyncWebServer* initServer() {
   server->on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/index.js", "text/javascript"); });
 
+  // favicon.ico
+  server->on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(LittleFS, "/favicon.ico", "image/png");
+  });
+
   // Respond to dimmer event
   server->on("/dimmer", HTTP_GET, dimmerRequest);
 
