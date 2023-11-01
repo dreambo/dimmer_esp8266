@@ -1,6 +1,6 @@
 
 #include "dimmer.h"
-#include <WebSerial.h>
+#include "webserial.h"
 
 volatile boolean zero = true;
 volatile boolean cent = false;
@@ -20,7 +20,7 @@ void setDimmer(String power) {
     zero = (power == "0");
     cent = (power == "100");
     dimmerPower = map(power.toInt(), 0, 100, MAX_MICROS, MIN_MICROS);
-    WebSerial.println("Power: " + power + ", dimmerPower: " + String(dimmerPower) + " -- max micros: " + String(MAX_MICROS));
+    print("Power: " + power + ", dimmerPower: " + String(dimmerPower) + " -- max micros: " + String(MAX_MICROS));
     // dimmerPower = map(status.toInt(), 0, 100, 0, 90); // for Bresenham dimmer
 }
 

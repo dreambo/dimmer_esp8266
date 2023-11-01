@@ -2,6 +2,7 @@
 #include "mqtt.h"
 #include "wifi.h"
 #include "dimmer.h"
+#include "webserial.h"
 
 #define MQTT_HOST IPAddress(192,168,0,6)
 #define MQTT_PORT 1883
@@ -29,22 +30,23 @@ unsigned long currentMillis, previousMillis = 0;
 const unsigned long interval = 4000;
 
 void connectToMqtt() {
-  Serial.println("Connecting to MQTT...");
+  print("Connecting to MQTT...");
   mqttClient.connect();
 }
 
 void mqttSubscribe() {
-  // mqttClient.subscribe(MQTT_SUB_BATTERY_POWER, 1); // power of battery (negatif if discharging)
-  // mqttClient.subscribe(MQTT_SUB_BATTERY_STATE, 1); // percent of battery charge 
-  // mqttClient.subscribe(MQTT_SUB_HOME_POWER, 1);    // inverter output active power 
+  mqttClient.subscribe(MQTT_SUB_BATTERY_POWER, 1); // power of battery (negatif if discharging)
+  mqttClient.subscribe(MQTT_SUB_BATTERY_STATE, 1); // percent of battery charge 
+  mqttClient.subscribe(MQTT_SUB_HOME_POWER, 1);    // inverter output active power 
   mqttClient.subscribe(MQTT_SUB_DIM, 1);           // manual set of percent of dimmer power
-  // mqttClient.subscribe(MQTT_SUB_MAINS, 1);         // mains power
+  mqttClient.subscribe(MQTT_SUB_MAINS, 1);         // mains power
 }
 
 void setDimmerValue() {
 
-  Serial.print("batteryState: " + String(batteryState)+ " --> batteryPower: " + String(batteryPower));
-  Serial.println(" --> homePower: " + String(homePower) + " --> mainsPower: " + String(mainsPower));
+  String log = "batteryState: " + String(batteryState)+ " --> batteryPower: " + String(batteryPower) + 
+               " --> homePower: " + String(homePower) + " --> mainsPower: " + String(mainsPower);
+  print(log);
 
   if (mainsPower > 0) {
     dimmerValue = 0;
@@ -68,39 +70,39 @@ void setDimmerValue() {
 }
 
 void onMqttConnect(bool sessionPresent) {
-  Serial.println("Connected to MQTT.");
-  Serial.print("Session present: ");
-  Serial.println(sessionPresent);
+  print("Connected to MQTT.");
+  print("Session present: ");
+  print(String(sessionPresent));
 
   mqttSubscribe();
-  timer.attach(5, setDimmerValue);
+  timer.attach(10, setDimmerValue);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-  Serial.println("Disconnected from MQTT.");
+  print("Disconnected from MQTT.");
   if (WiFi.isConnected()) {
     mqttReconnectTimer.once(2, connectToMqtt);
   }
 }
 
 void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-  Serial.println("Subscribe acknowledged.");
-  Serial.print("  packetId: ");
-  Serial.println(packetId);
-  Serial.print("  qos: ");
-  Serial.println(qos);
+  print("Subscribe acknowledged.");
+  print("  packetId: ");
+  print(String(packetId));
+  print("  qos: ");
+  print(String(qos));
 }
 
 void onMqttUnsubscribe(uint16_t packetId) {
-  Serial.println("Unsubscribe acknowledged.");
-  Serial.print("  packetId: ");
-  Serial.println(packetId);
+  print("Unsubscribe acknowledged.");
+  print("  packetId: ");
+  print(String(packetId));
 }
 
 void onMqttPublish(uint16_t packetId) {
-  Serial.print("Publish acknowledged.");
-  Serial.print("  packetId: ");
-  Serial.println(packetId);
+  print("Publish acknowledged.");
+  print("  packetId: ");
+  print(String(packetId));
 }
 
 String toString(char *data, unsigned int length) {
@@ -114,24 +116,24 @@ String toString(char *data, unsigned int length) {
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
   /*
-  Serial.println("Publish received.");
-  Serial.print("  topic: ");
-  Serial.println(topic);
-  Serial.print("  qos: ");
-  Serial.println(properties.qos);
-  Serial.print("  dup: ");
-  Serial.println(properties.dup);
-  Serial.print("  retain: ");
-  Serial.println(properties.retain);
-  Serial.print("  len: ");
-  Serial.println(len);
-  Serial.print("  index: ");
-  Serial.println(index);
-  Serial.print("  total: ");
-  Serial.println(total);
+  print("Publish received.");
+  print("  topic: ");
+  print(topic);
+  print("  qos: ");
+  print(properties.qos);
+  print("  dup: ");
+  print(properties.dup);
+  print("  retain: ");
+  print(properties.retain);
+  print("  len: ");
+  print(len);
+  print("  index: ");
+  print(index);
+  print("  total: ");
+  print(total);
   */
-  Serial.print(topic);
-  Serial.println(" --> " + toString(payload, len));
+
+  // print(String(topic) + " --> " + toString(payload, len));
 
   if (strcmp(topic, MQTT_SUB_BATTERY_POWER) == 0) {
     batteryPower = toString(payload, len).toInt();
@@ -161,10 +163,6 @@ void setup_mqtt() {
   // mqttClient.onPublish(onMqttPublish);
   mqttClient.onMessage(onMqttMessage);
 
-  while (!WiFi.isConnected()) {
-    Serial.print("-");
-    delay(500);
-  }
   connectToMqtt();
 }
 

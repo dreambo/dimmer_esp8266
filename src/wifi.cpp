@@ -3,7 +3,6 @@
 String ssid, password;
 
 void connectToWifi() {
-  Serial.println("Connecting to Wi-Fi " + ssid + " ...");
   digitalWrite(LED_BUILTIN, ON);
   WiFi.begin(ssid, password);
 }
@@ -58,6 +57,7 @@ String scanWifi() {
     wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
     wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
 
+    Serial.print("Connecting to Wi-Fi " + ssid + " ...");
     connectToWifi();
   }
 
@@ -91,6 +91,7 @@ String scanWifi() {
     WiFi.onEvent(wifiDisConnected, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
     WiFi.onEvent(wifiGotIP, ARDUINO_EVENT_WIFI_STA_GOT_IP);
 
+    Serial.print("Connecting to Wi-Fi " + ssid + " ...");
     connectToWifi();
   }
 
