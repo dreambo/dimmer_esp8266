@@ -4,5 +4,5 @@
     #include <Ticker.h>
     #include <AsyncMqttClient.h>
 
-    void setup_mqtt();
+    void setup_mqtt(const char* login, const char* password);
 #endif

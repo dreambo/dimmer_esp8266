@@ -21,6 +21,8 @@ int batteryState = 85;
 int batteryPower = 0;
 int mainsPower = 0;
 int dimmerValue;
+int counter = 0;
+int nbSubscribers = 4;
 
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
@@ -75,13 +77,13 @@ void onMqttConnect(bool sessionPresent) {
   print(String(sessionPresent));
 
   mqttSubscribe();
-  timer.attach(10, setDimmerValue);
+  // timer.attach(10, setDimmerValue);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
   print("Disconnected from MQTT.");
   if (WiFi.isConnected()) {
-    mqttReconnectTimer.once(2, connectToMqtt);
+    mqttReconnectTimer.once(3, connectToMqtt);
   }
 }
 
@@ -137,24 +139,33 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 
   if (strcmp(topic, MQTT_SUB_BATTERY_POWER) == 0) {
     batteryPower = toString(payload, len).toInt();
+    ++counter;
   } else if (strcmp(topic, MQTT_SUB_BATTERY_STATE) == 0) {
     batteryState = toString(payload, len).toInt();
+    ++counter;
   } else if (strcmp(topic, MQTT_SUB_HOME_POWER) == 0) {
     homePower = toString(payload, len).toInt();
+    ++counter;
   } else if (strcmp(topic, MQTT_SUB_MAINS) == 0) {
     mainsPower = toString(payload, len).toInt();
+    ++counter;
   } else if (strcmp(topic, MQTT_SUB_DIM) == 0) {
     dimmerValue = toString(payload, len).toInt();
     setDimmer(String(dimmerValue));
     // mqttClient.publish(MQTT_PUB_DIM, 1, true, String(dimmerValue).c_str());
     return;
   }
+
+  if (counter == nbSubscribers) {
+    setDimmerValue();
+    counter = 0;
+  }
 }
 
-void setup_mqtt() {
+void setup_mqtt(const char* login, const char* password) {
 
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
-  mqttClient.setCredentials("dreambo", "bouBouS01");
+  mqttClient.setCredentials(login, password);
 
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);

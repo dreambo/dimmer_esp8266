@@ -8,8 +8,11 @@
 
 const String WIFI_SSID = "freeboxhd";
 const String WIFI_PASSWORD = "01002003004005F";
+const char* MQTT_LOGIN = "dreambo";
+const char* MQTT_PASSWORD = "bouBouS01";
 Ticker serverTimer;
 AsyncWebServer* server = NULL;
+
 
 void reloadWebServer() {
   print(" ----> restarting web server ....");
@@ -30,9 +33,6 @@ void setup() {
   server = initServer();
 
   if (server != NULL) {
-    // WebSerial
-    setup_webserial(server);
-
     // Connect to WIFI
     setup_wifi(WIFI_SSID, WIFI_PASSWORD);
   
@@ -41,8 +41,11 @@ void setup() {
       delay(3000);
     }
 
+    // WebSerial
+    setup_webserial(server);
+
     // setup mqtt
-    setup_mqtt();
+    setup_mqtt(MQTT_LOGIN, MQTT_PASSWORD);
 
     // dimmer
     setup_dimmer();
