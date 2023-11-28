@@ -11,4 +11,5 @@
     #endif
 
     AsyncWebServer* initServer();
+    boolean restartServer();
 #endif

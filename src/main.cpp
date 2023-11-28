@@ -1,4 +1,3 @@
-
 #include "server.h"
 #include "wifi.h"
 #include "mqtt.h"
@@ -13,16 +12,15 @@ const char* MQTT_PASSWORD = "bouBouS01";
 Ticker serverTimer;
 AsyncWebServer* server = NULL;
 
-
 void reloadWebServer() {
-  print(" ----> restarting web server ....");
-  /*
-  delete server;
-  server = initServer();
-  setup_webserial(server);
-  AsyncElegantOTA.begin(server);
-  server->begin();
-  */
+  if (restartServer()) {
+    print("----> restarting web server...");
+    delete server;
+    server = initServer();
+    setup_webserial(server);
+    AsyncElegantOTA.begin(server);
+    server->begin();
+  }
 }
 
 void setup() {
@@ -41,8 +39,11 @@ void setup() {
       delay(3000);
     }
 
-    // WebSerial
+    // WebSerial (accessible via /webserial)
     setup_webserial(server);
+
+    // ElegantOTA (accessible via /update)
+    AsyncElegantOTA.begin(server);
 
     // setup mqtt
     setup_mqtt(MQTT_LOGIN, MQTT_PASSWORD);
@@ -50,10 +51,7 @@ void setup() {
     // dimmer
     setup_dimmer();
 
-    // ElegantOTA (accessible via /update)
-    AsyncElegantOTA.begin(server);
-
-    serverTimer.attach(600, reloadWebServer);
+    serverTimer.attach(60, reloadWebServer);
 
     // start the server
     server->begin();

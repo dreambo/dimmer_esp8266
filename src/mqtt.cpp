@@ -22,7 +22,7 @@ int batteryPower = 0;
 int mainsPower = 0;
 int dimmerValue;
 int counter = 0;
-int nbSubscribers = 4;
+int nbSubscribers = 0;
 
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
@@ -37,11 +37,12 @@ void connectToMqtt() {
 }
 
 void mqttSubscribe() {
-  mqttClient.subscribe(MQTT_SUB_BATTERY_POWER, 1); // power of battery (negatif if discharging)
-  mqttClient.subscribe(MQTT_SUB_BATTERY_STATE, 1); // percent of battery charge 
-  mqttClient.subscribe(MQTT_SUB_HOME_POWER, 1);    // inverter output active power 
-  mqttClient.subscribe(MQTT_SUB_DIM, 1);           // manual set of percent of dimmer power
-  mqttClient.subscribe(MQTT_SUB_MAINS, 1);         // mains power
+  mqttClient.subscribe(MQTT_SUB_BATTERY_POWER, 1); ++nbSubscribers; // power of battery (negatif if discharging)
+  mqttClient.subscribe(MQTT_SUB_BATTERY_STATE, 1); ++nbSubscribers; // percent of battery charge 
+  mqttClient.subscribe(MQTT_SUB_HOME_POWER, 1); ++nbSubscribers;    // inverter output active power 
+  mqttClient.subscribe(MQTT_SUB_MAINS, 1); ++nbSubscribers;         // mains power
+
+  mqttClient.subscribe(MQTT_SUB_DIM, 1);                            // manual set of percent of dimmer power
 }
 
 void setDimmerValue() {

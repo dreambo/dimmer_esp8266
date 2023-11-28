@@ -1,10 +1,17 @@
 
 #include "server.h"
 #include "dimmer.h"
+#include "webserial.h"
 #include <LittleFS.h>
+
+boolean restartWbServer;
 
 void notFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "Not found");
+}
+
+boolean restartServer() {
+  return restartWbServer;
 }
 
 // manual dimmer control via web
@@ -12,7 +19,15 @@ void dimmerRequest(AsyncWebServerRequest *request) {
   String power;
   if (request->hasParam(POWER_PARAM)) {
       power = request->getParam(POWER_PARAM)->value();
-      setDimmer(power);
+      if (power == "-1") {
+        print("Rebooting...");
+        ESP.restart();
+      } else if (power == "-2") {
+        print("Restarting server...");
+        restartWbServer = true;
+      } else {
+        setDimmer(power);
+      }
   } else {
       power = "No message sent";
   }
@@ -20,6 +35,8 @@ void dimmerRequest(AsyncWebServerRequest *request) {
 }
 
 AsyncWebServer* initServer() {
+
+  restartWbServer = false;
 
   // Webserver
   AsyncWebServer* server = new AsyncWebServer(80);

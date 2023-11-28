@@ -18,6 +18,10 @@ function updateSlider(value) {
   send(value);
 }
 
+function reboot(i) {
+  send(i);
+}
+
 function send(value) {
   console.log('dimmer value:', value);
   fetch(`/dimmer?power=${value}`).then(res => console.log(res));
